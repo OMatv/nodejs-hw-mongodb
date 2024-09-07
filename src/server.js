@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 
 import * as contactServices from './services/contacts.js';
 
+import errorHandler from './middlewares/errorHandler.js';
+
+import notFoundHandler from './middlewares/notFoundHandler.js';
+
 dotenv.config();
 
 export const startServer = () => {
@@ -19,6 +23,8 @@ export const startServer = () => {
   app.use(logger);
   app.use(cors());
   app.use(express.json());
+  app.use(errorHandler);
+  app.use(notFoundHandler);
 
   app.get('/contacts', async (req, res) => {
     const data = await contactServices.getAllContacts();
@@ -59,7 +65,7 @@ export const startServer = () => {
     });
   });
 
-  const port = Number(process.env.PORT || 5000);
+  const port = Number(process.env.PORT || 5002);
 
   app.listen(port, () => console.log(`Server running on port ${port}`));
 };
