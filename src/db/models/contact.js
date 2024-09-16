@@ -2,19 +2,42 @@ import mongoose from 'mongoose';
 
 const contactSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    email: { type: String },
-    isFavourite: { type: Boolean, default: false },
+    name: {
+      type: String,
+      required: true,
+      minlength: 3,
+      maxlength: 20,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      minlength: 3,
+      maxlength: 20,
+    },
+    email: {
+      type: String,
+      required: false,
+      validate: {
+        validator: function (v) {
+          //  regex для валід email
+          return /\S+@\S+\.\S+/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid email!`,
+      },
+    },
+    isFavourite: {
+      type: Boolean,
+      default: false,
+    },
     contactType: {
       type: String,
-      enum: ['work', 'home', 'personal'],
-      default: 'personal',
+      enum: ['personal', 'work'],
+      required: true,
     },
   },
   { timestamps: true },
 );
 
-const contactCollection = mongoose.model('Contact', contactSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 
-export default contactCollection;
+export default Contact;
