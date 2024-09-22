@@ -1,43 +1,48 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
+import { handleSaveError, setUpdateOptions } from './hooks.js';
 
-const contactSchema = new mongoose.Schema(
+const contactSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
-      minlength: 3,
-      maxlength: 20,
-    },
-    phoneNumber: {
-      type: String,
-      required: true,
-      minlength: 3,
-      maxlength: 20,
+      required: [true, 'Name must exist'],
     },
     email: {
       type: String,
-      required: false,
-      validate: {
-        validator: function (v) {
-          //  regex для валід email
-          return /\S+@\S+\.\S+/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email!`,
-      },
+      required: [true, 'Email must exist'],
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
-    isFavourite: {
+    phone: {
+      type: String,
+      required: [true, 'Phone number must exist'],
+    },
+    favorite: {
       type: Boolean,
       default: false,
     },
-    contactType: {
+    address: {
       type: String,
-      enum: ['personal', 'work'],
-      required: true,
     },
   },
-  { timestamps: true },
+  { versionKey: false, timestamps: true },
 );
 
-const Contact = mongoose.model('Contact', contactSchema);
+contactSchema.post('save', handleSaveError);
 
-export default Contact;
+contactSchema.pre('findOneAndUpdate', setUpdateOptions);
+
+contactSchema.post('findOneAndUpdate', handleSaveError);
+
+const ContactCollection = model('contact', contactSchema);
+
+export const sortFields = [
+  'name',
+  'email',
+  'phone',
+  'favorite',
+  'address',
+  'createdAt',
+  'updatedAt',
+];
+
+export default ContactCollection;
