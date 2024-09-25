@@ -5,35 +5,38 @@ const contactSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name must exist'],
+      required: true,
+    },
+    phoneNumber: {
+      type: Number,
+      required: true,
     },
     email: {
       type: String,
-      required: [true, 'Email must exist'],
-      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
     },
-    phone: {
-      type: String,
-      required: [true, 'Phone number must exist'],
-    },
-    favorite: {
+    isFavourite: {
       type: Boolean,
       default: false,
     },
-    address: {
+    contactType: {
       type: String,
+      required: true,
+      enum: ['work', 'home', 'personal'],
+      default: 'personal',
     },
   },
-  { versionKey: false, timestamps: true },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
-
 contactSchema.post('save', handleSaveError);
 
-contactSchema.pre('findOneAndUpdate', setUpdateOptions);
+contactSchema.pre('findByIdAndUpdate', setUpdateOptions);
 
-contactSchema.post('findOneAndUpdate', handleSaveError);
+contactSchema.post('findByIdAndUpdate', handleSaveError);
 
-const ContactCollection = model('contact', contactSchema);
+const ContactsCollection = model('contacts', contactSchema);
 
 export const sortFields = [
   'name',
@@ -45,4 +48,4 @@ export const sortFields = [
   'updatedAt',
 ];
 
-export default ContactCollection;
+export default ContactsCollection;

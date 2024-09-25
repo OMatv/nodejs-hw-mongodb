@@ -1,18 +1,29 @@
-import parseInteger from './parseNumber.js';
+const parseContactType = (type) => {
+  const isString = typeof type === 'string';
+  if (!isString) return;
 
-export default function parseContactFilterParams({
-  minAge,
-  maxAge,
-  name,
-  email,
-}) {
-  const parsedMinAge = parseInteger(minAge);
-  const parsedMaxAge = parseInteger(maxAge);
+  const isContactType = (type) => ['work', 'home', 'personal'].includes(type);
+
+  if (isContactType(type)) return type;
+  return undefined;
+};
+
+const parseBoolean = (value) => {
+  if (typeof value === 'string') {
+    if (value.toLowerCase() === 'true') return true;
+    if (value.toLowerCase() === 'false') return false;
+  }
+  return undefined;
+};
+
+export default function parseContactFilterParams(query) {
+  const { isFavourite, type } = query;
+
+  const parsedIsFavourite = parseBoolean(isFavourite);
+  const parsedType = parseContactType(type);
 
   return {
-    minAge: parsedMinAge,
-    maxAge: parsedMaxAge,
-    name: name ? name.trim() : undefined,
-    email: email ? email.trim() : undefined,
+    isFavourite: parsedIsFavourite,
+    contactType: parsedType,
   };
 }
