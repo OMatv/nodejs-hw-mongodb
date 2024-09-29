@@ -38,6 +38,7 @@ export default function startServer() {
   });
 
   app.use(errorHandler);
+
   app.use('*', notFoundHandler);
   const port = Number(env('PORT', 3000));
 
