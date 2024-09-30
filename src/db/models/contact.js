@@ -41,9 +41,9 @@ const ContactsCollection = model('contacts', contactSchema);
 export const sortFields = [
   'name',
   'email',
-  'phone',
-  'favorite',
-  'address',
+  'phoneNumber',
+  'isFavourite',
+  'contactType',
   'createdAt',
   'updatedAt',
 ];

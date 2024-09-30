@@ -1,7 +1,6 @@
-import express from 'express';
-import { register } from '../services/auth.js';
+// import { register } from '../services/auth.js';
 
-// import { Router } from 'express';
+import { Router } from 'express';
 
 import * as authControllers from '../controllers/auth.js';
 
@@ -11,10 +10,10 @@ import validateBody from '../middlewares/validateBody.js';
 import {
   userSignupSchema,
   userSignInSchema,
-  userRegisterSchema,
+  // userRegisterSchema,
 } from '../validation/users.js';
 
-const authRouter = express.Router();
+const authRouter = Router();
 
 authRouter.post(
   '/signup',
@@ -28,12 +27,12 @@ authRouter.post(
   ctrlWrapper(authControllers.signInController),
 );
 
-authRouter.post(
-  '/register',
-  register,
-  validateBody(userRegisterSchema),
-  ctrlWrapper(authControllers.register),
-);
+// authRouter.post(
+//   '/register',
+//   register,
+//   validateBody(userRegisterSchema),
+//   ctrlWrapper(authControllers.register),
+// );
 authRouter.post('/refresh', ctrlWrapper(authControllers.refreshController));
 
 authRouter.post('/signOut', ctrlWrapper(authControllers.signOutController));

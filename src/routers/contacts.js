@@ -32,7 +32,7 @@ contactsRouter.get(
 contactsRouter.post(
   '/',
   validateBody(contactAddSchema),
-  ctrlWrapper(contactControllers.createContactController),
+  ctrlWrapper(contactControllers.addContactController),
 );
 
 contactsRouter.put(
