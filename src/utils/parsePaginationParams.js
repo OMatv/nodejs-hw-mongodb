@@ -1,19 +1,20 @@
-const parseInteger = (value) => {
-  if (typeof value !== 'string') return;
+const parseInteger = (value, defaultValue) => {
+  console.log(value);
+  if(typeof value !== "string") return defaultValue;
 
-  const parsedNumber = parseInt(value, 10);
-  if (Number.isNaN(parsedNumber) || parsedNumber <= 0) return;
+  const parsedValue = parseInt(value);
+  if(Number.isNaN(parsedValue)) return defaultValue;
 
-  return parsedNumber;
+  return parsedValue;
 };
 
-export default function parsePaginationParams({ page, perPage }) {
-  // Перевірка та парсинг параметрів
-  const parsedPage = parseInteger(page) || 1;
-  const parsedPerPage = parseInteger(perPage) || 10;
+export default function parsePaginationParams ({perPage, page}) {
+  const parsedPerPage = parseInteger(perPage, 10);
+  const parsedPage = parseInteger(page, 1);
 
   return {
-    page: parsedPage,
-    perPage: parsedPerPage,
+      perPage: parsedPerPage,
+      page: parsedPage,
   };
-}
+};
+
