@@ -22,14 +22,14 @@ export const signupController = async (req, res) => {
   });
 };
 
-export const signInController = async (req, res) => {
-  const session = await authServices.signIn(req.body);
+export const signinController = async (req, res) => {
+  const session = await authServices.signin(req.body);
 
   setupSession(res, session);
 
   res.json({
     status: 200,
-    message: 'Successfully signIn',
+    message: 'Successfully signin',
     data: {
       accessToken: session.accessToken,
     },
@@ -54,10 +54,10 @@ export const refreshController = async (req, res) => {
   });
 };
 
-export const signOutController = async (req, res) => {
+export const signoutController = async (req, res) => {
   const { sessionId } = req.cookies;
   if (sessionId) {
-    await authServices.signOut(sessionId);
+    await authServices.signout(sessionId);
   }
 
   res.clearCookie('sessionId');

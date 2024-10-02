@@ -1,29 +1,26 @@
-const parseContactType = (type) => {
-  const isString = typeof type === 'string';
-  if (!isString) return;
 
-  const isContactType = (type) => ['work', 'home', 'personal'].includes(type);
-
-  if (isContactType(type)) return type;
-  return undefined;
+// Функція для перевірки і валідації рядка
+const parseString = (value) => {
+  if (typeof value !== "string" || value.trim() === "") return;
+  return value.trim();
 };
 
-const parseBoolean = (value) => {
-  if (typeof value === 'string') {
-    if (value.toLowerCase() === 'true') return true;
-    if (value.toLowerCase() === 'false') return false;
-  }
-  return undefined;
+// Функція для перевірки і валідації телефонного номера
+const parsePhoneNumber = (value) => {
+  if (typeof value !== "string") return;
+
+  const parsedNumber = parseInt(value);
+  if (Number.isNaN(parsedNumber)) return;
+
+  return parsedNumber;
 };
 
-export default function parseContactFilterParams(query) {
-  const { isFavourite, type } = query;
-
-  const parsedIsFavourite = parseBoolean(isFavourite);
-  const parsedType = parseContactType(type);
+export default function parseContactFilterParams({ name, phoneNumber }) {
+  const parsedName = parseString(name);
+  const parsedPhoneNumber = parsePhoneNumber(phoneNumber);
 
   return {
-    isFavourite: parsedIsFavourite,
-    contactType: parsedType,
+    name: parsedName,
+    phoneNumber: parsedPhoneNumber,
   };
 }

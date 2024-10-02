@@ -1,20 +1,16 @@
-const parseNumber = (number, defaultValue) => {
-  const isString = typeof number === 'string';
-  if (!isString) return defaultValue;
+const parseInteger = (value) => {
+  if (typeof value !== 'string') return;
 
-  const parsedNumber = parseInt(number);
-  if (Number.isNaN(parsedNumber)) {
-    return defaultValue;
-  }
+  const parsedNumber = parseInt(value, 10);
+  if (Number.isNaN(parsedNumber) || parsedNumber <= 0) return;
 
   return parsedNumber;
 };
 
-export default function parsePaginationParams(query) {
-  const { page, perPage } = query;
-
-  const parsedPage = parseNumber(page, 1);
-  const parsedPerPage = parseNumber(perPage, 10);
+export default function parsePaginationParams({ page, perPage }) {
+  // Перевірка та парсинг параметрів
+  const parsedPage = parseInteger(page) || 1;
+  const parsedPerPage = parseInteger(perPage) || 10;
 
   return {
     page: parsedPage,

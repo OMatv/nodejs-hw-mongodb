@@ -49,7 +49,7 @@ export const signup = async (payload) => {
 };
 
 // Функція для авторизації користувача
-export const signIn = async (payload) => {
+export const signin = async (payload) => {
   const { email, password } = payload;
   const user = await UserCollection.findOne({ email });
   if (!user) {
@@ -105,7 +105,7 @@ export const refreshSession = async ({ refreshToken, sessionId }) => {
 };
 
 // Функція для видалення сесії
-export const signOut = async (sessionId) => {
+export const signout = async (sessionId) => {
   await SessionCollection.deleteOne({ _id: sessionId });
 };
 

@@ -13,13 +13,17 @@ export const getAllContacts = async ({
 
   const contactsQuery = ContactsCollection.find();
 
-  if (filter.isFavourite !== undefined) {
-    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  if (filter.name !== undefined) {
+    contactsQuery.where('name').equals(filter.name);
   }
 
-  if (filter.contactType) {
-    contactsQuery.where('contactType').equals(filter.contactType);
+  if (filter.phoneNumber) {
+    contactsQuery.where('phoneNumber').equals(filter.phoneNumber);
   }
+
+  if(filter.userId) {
+    contactsQuery.where("userId").eq(filter.userId);
+}
 
   const [contactsCount, contacts] = await Promise.all([
     ContactsCollection.find().merge(contactsQuery).countDocuments(),
@@ -33,34 +37,36 @@ export const getAllContacts = async ({
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {
-    data: contacts,
+    page,
+    perPage,
+    contacts,
+    totalItems: contactsCount,
     ...paginationData,
-  };
+    };
 };
 
-export const getContactById = async (id) => {
-  return ContactsCollection.findById(id);
+export const getContactById = async (filter) => {
+  return ContactsCollection.findById(filter);
 };
 
 export const createContact = async (payload) => {
   return ContactsCollection.create(payload);
 };
 
-export const updateContact = async (filter, contact, options = {}) => {
+export const updateContact = async (filter, data, options = {}) => {
   const rawResult = await ContactsCollection.findByIdAndUpdate(
     filter,
-    contact,
+    data,
     {
-      new: true,
-      runValidators: true,
-      ...options,
+      includeResultMetadata: true,
+        ...options,
     },
   );
 
   if (!rawResult || !rawResult.value) return null;
 
   return {
-    contact: rawResult.value,
+    data: rawResult.value,
     isNew: Boolean(rawResult?.lastErrorObject?.upserted),
   };
 };

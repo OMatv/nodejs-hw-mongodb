@@ -1,5 +1,3 @@
-// import { register } from '../services/auth.js';
-
 import { Router } from 'express';
 
 import * as authControllers from '../controllers/auth.js';
@@ -9,8 +7,8 @@ import validateBody from '../middlewares/validateBody.js';
 
 import {
   userSignupSchema,
-  userSignInSchema,
-  // userRegisterSchema,
+  userSigninSchema,
+
 } from '../validation/users.js';
 
 const authRouter = Router();
@@ -22,19 +20,14 @@ authRouter.post(
 );
 
 authRouter.post(
-  '/signIn',
-  validateBody(userSignInSchema),
-  ctrlWrapper(authControllers.signInController),
+  '/signin',
+  validateBody(userSigninSchema),
+  ctrlWrapper(authControllers.signinController),
 );
 
-// authRouter.post(
-//   '/register',
-//   register,
-//   validateBody(userRegisterSchema),
-//   ctrlWrapper(authControllers.register),
-// );
+
 authRouter.post('/refresh', ctrlWrapper(authControllers.refreshController));
 
-authRouter.post('/signOut', ctrlWrapper(authControllers.signOutController));
+authRouter.post('/signout', ctrlWrapper(authControllers.signoutController));
 
 export default authRouter;

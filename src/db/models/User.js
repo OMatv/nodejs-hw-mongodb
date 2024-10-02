@@ -4,6 +4,7 @@ import { emailRegexp } from '../../constants/users.js';
 
 import { handleSaveError, setUpdateOptions } from './hooks.js';
 
+//register of users
 const userSchema = new Schema(
   {
     username: {
