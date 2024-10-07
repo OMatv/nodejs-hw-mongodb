@@ -26,12 +26,12 @@ const createSession = () => {
 };
 
 // Функція для реєстрації нового користувача
-export const signup = async (payload) => {
+export const register = async (payload) => {
   try {
     const { email, password } = payload;
     const user = await UserCollection.findOne({ email });
     if (user) {
-      throw createHttpError(409, 'Email already exist');
+      throw createHttpError(409, 'Email in use');
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -43,13 +43,13 @@ export const signup = async (payload) => {
 
     return data._doc;
   } catch (error) {
-    console.error('Error during signup:', error);
-    throw error; // Піднімаємо помилку вище для глобального обробника
+    console.error('Error during register:', error);
+    throw error;
   }
 };
 
 // Функція для авторизації користувача
-export const signin = async (payload) => {
+export const login = async (payload) => {
   const { email, password } = payload;
   const user = await UserCollection.findOne({ email });
   if (!user) {
@@ -105,7 +105,7 @@ export const refreshSession = async ({ refreshToken, sessionId }) => {
 };
 
 // Функція для видалення сесії
-export const signout = async (sessionId) => {
+export const logout = async (sessionId) => {
   await SessionCollection.deleteOne({ _id: sessionId });
 };
 

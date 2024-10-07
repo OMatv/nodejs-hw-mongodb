@@ -6,28 +6,28 @@ import ctrlWrapper from '../utils/ctrlWrapper.js';
 import validateBody from '../middlewares/validateBody.js';
 
 import {
-  userSignupSchema,
-  userSigninSchema,
+  userRegisterSchema,
+  userLoginSchema,
 
 } from '../validation/users.js';
 
 const authRouter = Router();
 
 authRouter.post(
-  '/signup',
-  validateBody(userSignupSchema),
-  ctrlWrapper(authControllers.signupController),
+  '/register',
+  validateBody(userRegisterSchema),
+  ctrlWrapper(authControllers.registerController),
 );
 
 authRouter.post(
-  '/signin',
-  validateBody(userSigninSchema),
-  ctrlWrapper(authControllers.signinController),
+  '/login',
+  validateBody(userLoginSchema),
+  ctrlWrapper(authControllers.loginController),
 );
 
 
 authRouter.post('/refresh', ctrlWrapper(authControllers.refreshController));
 
-authRouter.post('/signout', ctrlWrapper(authControllers.signoutController));
+authRouter.post('/logout', ctrlWrapper(authControllers.logoutController));
 
 export default authRouter;
