@@ -1,3 +1,5 @@
+
+
 import mongoose from 'mongoose';
 import { env } from '../utils/env.js';
 
@@ -14,4 +16,5 @@ export const initMongoConnection = async () => {
     console.log('Mongodb connection error', error.message);
     throw error;
   }
-};
+}
+

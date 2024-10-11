@@ -4,7 +4,7 @@ import cors from 'cors';
 
 import cookieParser from 'cookie-parser';
 
-import { env } from './utils/env.js';
+import { env} from './utils/env.js';
 
 import notFoundHandler from './middlewares/notFoundHandler.js';
 
@@ -16,12 +16,20 @@ import authRouter from './routers/auth.js';
 
 import contactsRouter from './routers/contacts.js';
 
+
+
 export default function startServer() {
   const app = express();
 
   app.use(logger);
   app.use(cors());
   app.use(express.json());
+  // app.use(
+  //   express.json({
+  //     type: ['application/json', 'application/vnd.api+json'],
+  //     limit: '100kb',
+  //   }),
+  // );
   app.use(cookieParser());
 
   app.use('/auth', authRouter);
@@ -43,7 +51,7 @@ export default function startServer() {
 
 
 
-  const port = Number(env('PORT', 3001));
+  const port = Number(env('PORT', 6000));
 
   app.listen(port, () => console.log(`Server running on port ${port}`));
 }
