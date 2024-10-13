@@ -7,7 +7,7 @@ import { handleSaveError, setUpdateOptions } from './hooks.js';
 //register of users
 const userSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
     },
