@@ -27,9 +27,9 @@ const userSchema = new Schema(
 
 userSchema.post('save', handleSaveError);
 
-userSchema.pre('findByIdAndUpdate', setUpdateOptions);
+userSchema.pre('findOneAndUpdate', setUpdateOptions);
 
-userSchema.post('findByIdAndUpdate', handleSaveError);
+userSchema.post('findOneAndUpdatee', handleSaveError);
 
 const UserCollection = model('user', userSchema);
 

@@ -26,6 +26,11 @@ const contactSchema = new Schema(
       enum: ['work', 'home', 'personal'],
       default: 'personal',
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -34,9 +39,9 @@ const contactSchema = new Schema(
 );
 contactSchema.post('save', handleSaveError);
 
-contactSchema.pre('findByIdAndUpdate', setUpdateOptions);
+contactSchema.pre('findOneAndUpdate', setUpdateOptions);
 
-contactSchema.post('findByIdAndUpdate', handleSaveError);
+contactSchema.post('findOneAndUpdate', handleSaveError);
 
 const ContactsCollection = model('contacts', contactSchema);
 
@@ -46,6 +51,7 @@ export const sortFields = [
   'phoneNumber',
   'isFavourite',
   'contactType',
+  ' userId:',
   'createdAt',
   'updatedAt',
 ];

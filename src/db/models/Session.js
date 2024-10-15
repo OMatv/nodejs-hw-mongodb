@@ -31,9 +31,9 @@ const sessionSchema = new Schema(
 
 sessionSchema.post('save', handleSaveError);
 
-sessionSchema.pre('findByIdAndUpdate', setUpdateOptions);
+sessionSchema.pre('findOneAndUpdate', setUpdateOptions);
 
-sessionSchema.post('findByIdAndUpdate', handleSaveError);
+sessionSchema.post('findOneAndUpdate', handleSaveError);
 
 const SessionCollection = model('session', sessionSchema);
 

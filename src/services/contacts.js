@@ -17,8 +17,8 @@ export const getAllContacts = async ({
     contactsQuery.where('name').equals(filter.name);
   }
 
-  if (filter.phoneNumber) {
-    contactsQuery.where('phoneNumber').equals(filter.phoneNumber);
+  if (filter.email) {
+    contactsQuery.where('email').equals(filter.email);
   }
 
   if(filter.userId) {
@@ -54,7 +54,7 @@ export const createContact = async (payload) => {
 };
 
 export const updateContact = async (filter, data, options = {}) => {
-  const rawResult = await ContactsCollection.findByIdAndUpdate(
+  const rawResult = await ContactsCollection.findOneAndUpdate(
     filter,
     data,
     {
@@ -72,5 +72,5 @@ export const updateContact = async (filter, data, options = {}) => {
 };
 
 export const deleteContact = async (filter) => {
-  return ContactsCollection.findByIdAndDelete(filter);
+  return ContactsCollection.findOneAndUpdate(filter);
 };
