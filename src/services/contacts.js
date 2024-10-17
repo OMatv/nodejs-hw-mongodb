@@ -46,11 +46,11 @@ export const getAllContacts = async ({
 };
 
 export const getContactById = async (filter) => {
-  return ContactsCollection.findById(filter);
+  return ContactsCollection.findOne(filter);
 };
 
 export const createContact = async (payload) => {
-  return ContactsCollection.create(payload);
+    return ContactsCollection.create(payload);
 };
 
 export const updateContact = async (filter, data, options = {}) => {
@@ -58,7 +58,7 @@ export const updateContact = async (filter, data, options = {}) => {
     filter,
     data,
     {
-      includeResultMetadata: true,
+      returnOriginal: false,
         ...options,
     },
   );
@@ -72,5 +72,5 @@ export const updateContact = async (filter, data, options = {}) => {
 };
 
 export const deleteContact = async (filter) => {
-  return ContactsCollection.findOneAndUpdate(filter);
+  return ContactsCollection.findOneAndDelete(filter);
 };

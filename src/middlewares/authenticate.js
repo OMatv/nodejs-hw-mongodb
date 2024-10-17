@@ -11,13 +11,14 @@ const authenticate = async (req, res, next) => {
 
   const [bearer, token] = authorization.split(' ');
 
-  if (bearer !== 'Bearer'|| !token) {
+  if (bearer !== 'Bearer') {
     return next(
       createHttpError(401, 'Authorization header must have Bearer type'),
     );
   }
 
   const session = await authServices.findSessionByAccessToken(token);
+  console.log('Session:', session);
   if (!session) {
     return next(createHttpError(401, 'Session not found'));
   }
