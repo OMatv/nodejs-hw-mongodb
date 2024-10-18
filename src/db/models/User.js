@@ -1,4 +1,6 @@
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
+
+import { ROLES } from '../../constants/index.js';
 
 import { emailRegexp } from '../../constants/users.js';
 
@@ -21,16 +23,30 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+        updateAt: {
+          type: Date,
+          default: Date.now,
+                },
+    role: {
+      type: String,
+      enum: [ROLES.TEACHER, ROLES.PARENT],
+      default: ROLES.PARENT,
+    },
   },
-  { versionKey: false, timestamps: true },
+  { timestamps: true, versionKey: false },
 );
 
 userSchema.post('save', handleSaveError);
 
 userSchema.pre('findOneAndUpdate', setUpdateOptions);
 
-userSchema.post('findOneAndUpdatee', handleSaveError);
+userSchema.post('findOneAndUpdate', handleSaveError);
 
-const UserCollection = model('user', userSchema);
+const UsersCollection = model('users', userSchema);
 
-export default UserCollection;
+export default UsersCollection;

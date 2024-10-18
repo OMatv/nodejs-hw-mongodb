@@ -40,8 +40,7 @@ export default function startServer() {
   app.use(errorHandler);
 
 
-
-  const port = Number(env('PORT', 3000));
+  const port = Number(env('PORT', '3000'));
 
   app.listen(port, () => console.log(`Server running on port ${port}`));
 }

@@ -6,21 +6,40 @@ const parseString = (value) => {
 };
 
 // Функція для перевірки і валідації телефонного номера
-const parsePhoneNumber = (value) => {
-  if (typeof value !== "string") return;
+const parseNumber = (number) => {
+  const isString = typeof number === 'string';
+  if (!isString) return;
 
-  const parsedNumber = parseInt(value);
-  if (Number.isNaN(parsedNumber)) return;
+  const parsedNumber = parseInt(number);
+   if (Number.isNaN(parsedNumber)) {
+    return;
+  }
 
   return parsedNumber;
 };
 
-export default function parseContactFilterParams({ name, phoneNumber }) {
+ const parseContactType = (value)  => {
+  if (typeof value === 'string') return;
+  const contactTypes = ['work', 'home', 'personal'];
+  if (!contactTypes.includes(value));
+  return value;
+ }
+
+
+export default function parseContactFilterParams({ query}) {
+  const {name, email, phoneNumber, contactType, isFavourite} = query;
+
   const parsedName = parseString(name);
-  const parsedPhoneNumber = parsePhoneNumber(phoneNumber);
+  const parsedPhoneNumber = parseNumber(phoneNumber);
+  const parsedEmail = parseString(email);
+  const parsedContactType = parseContactType(contactType);
+  const parsedIsFavourite = isFavourite === 'true' ? true : isFavourite === 'false';
 
   return {
     name: parsedName,
     phoneNumber: parsedPhoneNumber,
+    email: parsedEmail,
+    contactType: parsedContactType,
+    isFavourite: parsedIsFavourite
   };
 }

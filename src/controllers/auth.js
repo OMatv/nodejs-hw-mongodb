@@ -1,22 +1,20 @@
+
 import * as authServices from '../services/auth.js';
 
-
-const setupSession = (session, res) => {
-  res.cookie('sessionId', session._id, {
-    httpOnly: true,
-    expires: new Date(Date.now() + session.refreshTokenValidUntil),
-  });
+const setupSession = (res, session ) => {
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
     expires: new Date(Date.now() + session.refreshTokenValidUntil),
   });
 
-
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    expires: new Date(Date.now() + session.refreshTokenValidUntil),
+  });
 };
 
 export const registerController = async (req, res) => {
-
-  const newUser = await authServices.register(req.body);
+  const newUser = await authServices.registerUser(req.body);
 
   res.status(201).json({
     status: 201,
@@ -26,9 +24,9 @@ export const registerController = async (req, res) => {
 };
 
 export const loginController = async (req, res) => {
-  const session = await authServices.login(req.body);
+  const session = await authServices.loginUser(req.body);
 
-  setupSession(session, res);
+  setupSession( session, res);
 
   res.json({
     status: 200,
@@ -39,23 +37,15 @@ export const loginController = async (req, res) => {
   });
 };
 
-export const logoutController = async (req, res) => {
-  await authServices.logout(req.cookies.sessionId, req.cookies.sessionToken);
-
-  res.clearCookie('sessionId');
-  res.clearCookie('sessionToken');
-
-  res.status(204).send();
-};
-
 export const refreshController = async (req, res) => {
-  const { refreshToken, sessionId } = req.cookies;
+
   const session = await authServices.refreshSession({
-    refreshToken,
-    sessionId,
+     sessionId: req.cookies.sessionId,
+     refreshToken: req.cookies.refreshToken
+
   });
 
-  setupSession(session, res);
+  setupSession(res,session);
 
   res.json({
     status: 200,
@@ -66,3 +56,14 @@ export const refreshController = async (req, res) => {
   });
 };
 
+export const logoutController = async (req, res) => {
+
+  if (req.cookies.sessionId) {
+    await authServices.logoutUser(req.cookies.sessionId);
+  }
+
+  res.clearCookie('sessionId');
+  res.clearCookie('refreshToken');
+
+  res.status(204).send();
+};

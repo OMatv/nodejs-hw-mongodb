@@ -3,6 +3,7 @@ import { handleSaveError, setUpdateOptions } from './hooks.js';
 
 
 
+
 const contactSchema = new Schema(
   {
     name: {
@@ -26,11 +27,13 @@ const contactSchema = new Schema(
       enum: ['work', 'home', 'personal'],
       default: 'personal',
     },
+    // parentId:{type: Schema.Types.ObjectId, ref:'contacts'},
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'users',
       required: true,
-    },
+
+    }
   },
   {
     timestamps: true,
@@ -51,7 +54,6 @@ export const sortFields = [
   'phoneNumber',
   'isFavourite',
   'contactType',
-  ' userId:',
   'createdAt',
   'updatedAt',
 ];

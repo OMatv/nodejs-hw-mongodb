@@ -9,7 +9,7 @@ import {
   userRegisterSchema,
   userLoginSchema,
 
-} from '../validation/users.js';
+} from '../validation/auth.js';
 
 const authRouter = Router();
 
