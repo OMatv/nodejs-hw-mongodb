@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import createHttpError from 'http-errors';
 import { randomBytes } from 'crypto';
 
-import SessionCollection from '../db/models/Session.js';
-import UserCollection from '../db/models/User.js';
+import SessionsCollection  from '../db/models/Session.js';
+import UsersCollection  from '../db/models/User.js';
 
 import {
   accessTokenLifetime,
@@ -26,16 +26,16 @@ const createSession = () => {
 };
 
 // Функція для реєстрації нового користувача
-export const register = async (payload) => {
+export const registerUser = async (payload) => {
   try {
-    const { email, password } = payload;
-    const user = await UserCollection.findOne({ email });
+
+    const user = await UsersCollection.findOne({ email: payload.email });
     if (user) {
       throw createHttpError(409, 'Email in use');
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
-    const data = await UserCollection.create({
+    const hashPassword = await bcrypt.hash(payload.password, 10);
+    const data = await UsersCollection.create({
       ...payload,
       password: hashPassword,
     });
@@ -49,23 +49,23 @@ export const register = async (payload) => {
 };
 
 // Функція для авторизації користувача
-export const login = async (payload) => {
+export const loginUser = async (payload) => {
   const { email, password } = payload;
-  const user = await UserCollection.findOne({ email });
+  const user = await UsersCollection.findOne({ email });
   if (!user) {
     throw createHttpError(401, 'Email or password invalid');
   }
 
-  const passwordCompare = await bcrypt.compare(password, user.password);
+  const passwordCompare = await bcrypt.compare(password, user.password);//порівнюємо хеші паролів
   if (!passwordCompare) {
     throw createHttpError(401, 'Email or password invalid');
   }
 
-  await SessionCollection.deleteOne({ userId: user._id });
+  await SessionsCollection.deleteOne({ userId: user._id });
 
   const sessionData = createSession();
 
-  const userSession = await SessionCollection.create({
+  const userSession = await SessionsCollection.create({
     userId: user._id,
     ...sessionData,
   });
@@ -75,39 +75,33 @@ export const login = async (payload) => {
 
 // Функція для пошуку сесії по access токену
 export const findSessionByAccessToken = (accessToken) =>
-  SessionCollection.findOne({ accessToken });
+  SessionsCollection.findOne({ accessToken });
 
 // Функція для оновлення сесії на основі refresh токену
-export const refreshSession = async ({ refreshToken, sessionId }) => {
-  const oldSession = await SessionCollection.findOne({
+export const refreshSession = async ({ sessionId,refreshToken }) => {
+
+  const session = await SessionsCollection.findOne({
     _id: sessionId,
     refreshToken,
   });
 
-  if (!oldSession) {
+  if (!session) {
     throw createHttpError(401, 'Session not found');
   }
-
-  if (new Date() > oldSession.refreshTokenValidUntil) {
+ const isSessionTokenExpired = new Date() >new Date(session.refreshTokenValidUntil);
+ if (isSessionTokenExpired) {
     throw createHttpError(401, 'Session token expired');
   }
 
-  await SessionCollection.deleteOne({ _id: sessionId });
-
-  const sessionData = createSession();
-
-  const userSession = await SessionCollection.create({
-    userId: oldSession.userId,
-    ...sessionData,
-  });
-
-  return userSession;
+  const newSession = createSession();
+  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
+  return await SessionsCollection.create({userId: session.userId,...newSession,});
 };
 
-// Функція для видалення сесії
-export const logout = async (sessionId) => {
-  await SessionCollection.deleteOne({ _id: sessionId });
+// Функція для виходу з сесії
+export const logoutUser = async (sessionId) => {
+  await SessionsCollection.deleteOne({ _id: sessionId });
 };
 
 // Функція для пошуку користувача за фільтром
-export const findUser = (filter) => UserCollection.findOne(filter);
+export const findUser = (filter) => UsersCollection.findOne(filter);

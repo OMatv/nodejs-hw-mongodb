@@ -24,12 +24,7 @@ export default function startServer() {
   app.use(logger);
   app.use(cors());
   app.use(express.json());
-  // app.use(
-  //   express.json({
-  //     type: ['application/json', 'application/vnd.api+json'],
-  //     limit: '100kb',
-  //   }),
-  // );
+
   app.use(cookieParser());
 
   app.use('/auth', authRouter);
@@ -51,7 +46,7 @@ export default function startServer() {
 
 
 
-  const port = Number(env('PORT', 6000));
+  const port = Number(env('PORT', '3000'));
 
   app.listen(port, () => console.log(`Server running on port ${port}`));
 }
