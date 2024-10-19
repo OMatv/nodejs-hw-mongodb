@@ -11,6 +11,20 @@ import {
 } from '../constants/users.js';
 
 // Функція створення нової сесії
+// const createSession = () => {
+//   const accessToken = randomBytes(30).toString('base64');
+//   const refreshToken = randomBytes(30).toString('base64');
+//   const accessTokenValidUntil = new Date(Date.now() + accessTokenLifetime);
+//   const refreshTokenValidUntil = new Date(Date.now() + refreshTokenLifetime);
+
+//   return {
+//     accessToken,
+//     refreshToken,
+//     accessTokenValidUntil,
+//     refreshTokenValidUntil,
+//   };
+// };
+
 const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
@@ -21,12 +35,38 @@ const createSession = () => {
     accessToken,
     refreshToken,
     accessTokenValidUntil,
-    refreshTokenValidUntil,
+    refreshTokenValidUntil, // Це повинно бути об'єктом Date
   };
+};
+// Функція для оновлення сесії на основі refresh токену
+export const refreshSession = async ({ sessionId,refreshToken }) => {
+
+  const session = await SessionsCollection.findOne({
+    _id: sessionId,
+    refreshToken,
+  });
+
+  if (!session) {
+    throw createHttpError(401, 'Session not found');
+  }
+ const isSessionTokenExpired = new Date() > new Date(session.refreshTokenValidUntil);
+
+ if (isSessionTokenExpired) {
+    throw createHttpError(401, 'Session token expired');
+  }
+
+  const newSession = createSession();
+
+  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
+
+  return await SessionsCollection.create({
+    userId: session.userId,
+    ...newSession,
+  });
 };
 
 // Функція для реєстрації нового користувача
-export const registerUser = async (payload) => {
+export const register = async (payload) => {
   try {
 
     const user = await UsersCollection.findOne({ email: payload.email });
@@ -49,19 +89,20 @@ export const registerUser = async (payload) => {
 };
 
 // Функція для авторизації користувача
-export const loginUser = async (payload) => {
-  const { email, password } = payload;
-  const user = await UsersCollection.findOne({ email });
+export const login = async (payload) => {
+
+  const user = await UsersCollection.findOne({email: payload.email });
   if (!user) {
-    throw createHttpError(401, 'Email or password invalid');
+    throw createHttpError(404, 'User not found');
   }
 
-  const passwordCompare = await bcrypt.compare(password, user.password);//порівнюємо хеші паролів
+  const passwordCompare = await bcrypt.compare(payload.password, user.password);//порівнюємо хеші паролів
   if (!passwordCompare) {
-    throw createHttpError(401, 'Email or password invalid');
+    throw createHttpError(401, 'Unauthorized');
   }
 
   await SessionsCollection.deleteOne({ userId: user._id });
+
 
   const sessionData = createSession();
 
@@ -77,29 +118,9 @@ export const loginUser = async (payload) => {
 export const findSessionByAccessToken = (accessToken) =>
   SessionsCollection.findOne({ accessToken });
 
-// Функція для оновлення сесії на основі refresh токену
-export const refreshSession = async ({ sessionId,refreshToken }) => {
-
-  const session = await SessionsCollection.findOne({
-    _id: sessionId,
-    refreshToken,
-  });
-
-  if (!session) {
-    throw createHttpError(401, 'Session not found');
-  }
- const isSessionTokenExpired = new Date() >new Date(session.refreshTokenValidUntil);
- if (isSessionTokenExpired) {
-    throw createHttpError(401, 'Session token expired');
-  }
-
-  const newSession = createSession();
-  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
-  return await SessionsCollection.create({userId: session.userId,...newSession,});
-};
 
 // Функція для виходу з сесії
-export const logoutUser = async (sessionId) => {
+export const logout= async (sessionId) => {
   await SessionsCollection.deleteOne({ _id: sessionId });
 };
 

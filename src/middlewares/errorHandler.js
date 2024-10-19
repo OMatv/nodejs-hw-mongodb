@@ -1,9 +1,8 @@
+export default function errorHandler(err, req, res)  {
+  console.error(err.stack);
 
-export default function errorHandler  (error, req, res) {
-  const {status = 500, message} = error;
-  res.status(status).json({
-      message,
+  res.status(err.status || 500).json({
+    status: 'error',
+    message: err.message || 'Internal Server Error',
   });
 };
-
-

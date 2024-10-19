@@ -3,7 +3,7 @@ export const SORT_ORDER = {
   DESC: "desc",
   }
 
-  export const ROLES = {
-      TEACHER: 'teacher',
-      PARENT: 'parent',
-    };
+  // export const ROLES = {
+  //     TEACHER: 'teacher',
+  //     PARENT: 'parent',
+  //   };
