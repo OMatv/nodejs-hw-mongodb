@@ -2,37 +2,6 @@
 import * as authServices from '../services/auth.js';
 
 
-// const setupSession = (res, session) => {
-//   // console.log('session.refreshTokenValidUntil:', session.refreshTokenValidUntil);
-//   res.cookie('refreshToken', session.refreshToken, {
-//     httpOnly: true,
-//     expires: new Date(Date.now() + session.refreshTokenValidUntil),
-//   });
-
-//   res.cookie('sessionId', session._id, {
-//     httpOnly: true,
-//     expires: new Date(Date.now() + session.refreshTokenValidUntil),
-//   });
-// };
-
-// const setupSession = (res, session) => {
-//   console.log('session.refreshTokenValidUntil:', session.refreshTokenValidUntil);
-//   const expires = new Date(Date.now() + session.refreshTokenValidUntil);
-
-//   if (isNaN(expires.getTime())) {
-//     throw new Error('Invalid expiration date');
-//   }
-
-//   res.cookie('refreshToken', session.refreshToken, {
-//     httpOnly: true,
-//     expires: expires,
-//   });
-
-//   res.cookie('sessionId', session._id, {
-//     httpOnly: true,
-//     expires: expires,
-//   });
-// };
 
 const setupSession = (res, session) => {
   console.log('session.refreshTokenValidUntil:', session.refreshTokenValidUntil);
