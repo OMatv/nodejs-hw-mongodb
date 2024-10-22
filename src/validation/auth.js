@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { emailRegexp } from '../constants/users.js';
+import { emailRegexp } from '../constants/contacts.js';
 
 export const userRegisterSchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
