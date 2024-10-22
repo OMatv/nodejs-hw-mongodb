@@ -8,6 +8,12 @@ import parseContactFilterParams from '../utils/filters/parseContactFilterParams.
 
 import { sortFields } from '../db/models/contact.js';
 
+
+import {  saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
+
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { env } from '../utils/env.js';
+
 export const getAllContactsController = async (req, res) => {
   const { perPage, page } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams({ ...req.query, sortFields });
@@ -76,24 +82,51 @@ export const upsertContactController = async (req, res) => {
   });
 };
 
-export const patchContactController = async (req, res) => {
-  const { id } = req.params;
-  const { _id: userId } = req.user;
-  const result = await contactsServices.updateContact(
-    { _id: id, userId },
-    req.body,
-  );
+export const patchContactController = async (req, res, next) => {
+  const { contactId } = req.params;
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
+  const result = await contactsServices.updateContact(contactId, {
+    ...req.body,
+    photo: photoUrl,
+  });
+
+
 
   if (!result) {
-    throw createHttpError(404, `Contact with id=${id} not found`);
+    next(createHttpError(404, ~`Contact  not found`));
+    return;
   }
+
 
   res.json({
     status: 200,
-    message: 'Contact patched successfully',
+    message: `Successfully patched a contact!`,
     data: result.data,
   });
 };
+  /* в photo лежить обʼєкт файлу
+		{
+		  fieldname: 'photo',
+		  originalname: 'download.jpeg',
+		  encoding: '7bit',
+		  mimetype: 'image/jpeg',
+		  destination: '/Users/borysmeshkov/Projects/goit-study/students-app/temp',
+		  filename: '1710709919677_download.jpeg',
+		  path: '/Users/borysmeshkov/Projects/goit-study/students-app/temp/1710709919677_download.jpeg',
+		  size: 7
+	  }
+	*/
 
 export const deleteContactController = async (req, res) => {
   const { id } = req.params;

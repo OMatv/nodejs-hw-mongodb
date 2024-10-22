@@ -13,6 +13,7 @@ import {
  createContactchema,
   updateContactSchema,
 } from '../validation/contacts.js';
+import { upload } from "../middlewares/multer.js";
 
 // import { checkRoles } from '../middlewares/checkRoles.js';
 
@@ -60,4 +61,31 @@ contactsRouter.delete(
   ctrlWrapper(contactControllers.deleteContactController),
 );
 
+
+contactsRouter.post(
+  '/',
+  //checkRoles(ROLES.TEACHER),
+  isValidId,
+  upload.single('photo'), // додаємо цю middleware
+  validateBody(createContactchema),
+  ctrlWrapper(contactControllers.createContactController),
+);
+
+contactsRouter.put(
+  '/:contactId',
+  //checkRoles(ROLES.TEACHER),
+  isValidId,
+  upload.single('photo'), // додаємо цю middleware
+  validateBody(createContactchema),
+  ctrlWrapper(contactControllers.upsertContactController),
+);
+
+contactsRouter.patch(
+  '/:contactId',
+  //checkRoles(ROLES.TEACHER, ROLES.PARENT),
+  isValidId,
+  upload.single('photo'), // додаємо цю middleware
+  validateBody(updateContactSchema),
+  ctrlWrapper(contactControllers.patchContactController),
+);
 export default contactsRouter;

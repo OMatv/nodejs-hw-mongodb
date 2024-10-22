@@ -18,6 +18,8 @@ import contactsRouter from './routers/contacts.js';
 
 import morgan from 'morgan';
 
+import { UPLOAD_DIR } from './constants/index.js';
+
 
 
 export default function startServer() {
@@ -45,6 +47,8 @@ export default function startServer() {
 
   app.use(notFoundHandler);
   app.use(errorHandler);
+
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
 
   const port = Number(env('PORT', '3000'));
