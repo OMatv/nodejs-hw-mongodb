@@ -1,15 +1,17 @@
 import Joi from 'joi';
 
+import{phoneNumberRegexp, emailRegexp} from '../constants/contacts.js';
+
 export const createContactchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
-  phoneNumber: Joi.number().min(6).max(13).required(),
-  email: Joi.string().email().optional(),
+  phoneNumber: Joi.number().pattern(phoneNumberRegexp).required(),
+  email: Joi.string().pattern(emailRegexp).optional(),
   isFavourite: Joi.boolean().optional(),
   contactType: Joi.string()
     .valid('work', 'home', 'personal')
     .default('personal')
-    .required(),
-    parentId: Joi.string().required(),
+    .optional(),
+
 });
 
 export const updateContactSchema = Joi.object({
