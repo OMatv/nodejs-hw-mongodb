@@ -12,7 +12,7 @@ export const getAllContacts = async ({
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactsCollection.find();
+  const contactsQuery = ContactsCollection.find({userId: filter.userId});
   if (filter.name) {
     contactsQuery.where('name').equals(filter.name);
     }
@@ -34,13 +34,13 @@ export const getAllContacts = async ({
      if (filter.isFavourite) {
       contactsQuery.where('isFavourite').equals(filter.isFavourite);
      }
-     if (filter.urerId) {
-      contactsQuery.where('userId').equals(filter.userId);
-     }
+    //  if (filter.urerId) {
+    //   contactsQuery.where('userId').equals(filter.userId);
+    //  }
 
 
     const [contactsCount, contacts ] = await Promise.all([
-      ContactsCollection.find().merge(contactsQuery).countDocuments(),
+      ContactsCollection.find({userId: filter.userId}).merge(contactsQuery).countDocuments(),
       contactsQuery.skip(skip).limit(limit).sort({ [sortBy]: sortOrder })
       .exec(),
     ])

@@ -16,6 +16,8 @@ import authRouter from './routers/auth.js';
 
 import contactsRouter from './routers/contacts.js';
 
+import morgan from 'morgan';
+
 
 
 export default function startServer() {
@@ -26,9 +28,14 @@ export default function startServer() {
   app.use(express.json());
 
   app.use(cookieParser());
+  app.use(morgan('dev'));
 
   app.use('/auth', authRouter);
   app.use('/contacts', contactsRouter);
+
+  app.get('/test', (req, res) => {
+    res.json({ message: 'Server is running!' });
+});
 
   app.get('/', (req, res) => {
     res.json({
@@ -38,12 +45,6 @@ export default function startServer() {
 
   app.use(notFoundHandler);
   app.use(errorHandler);
-
-  // app.get('/contacts', (req, res) => {
-  //   res.json('Contacts list');
-  // });
-
-
 
 
   const port = Number(env('PORT', '3000'));

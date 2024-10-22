@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 
-import { ROLES } from '../../constants/index.js';
+// import { ROLES } from '../../constants/index.js';
 
 import { emailRegexp } from '../../constants/users.js';
 
@@ -32,11 +32,11 @@ const userSchema = new Schema(
           type: Date,
           default: Date.now,
                 },
-    role: {
-      type: String,
-      enum: [ROLES.TEACHER, ROLES.PARENT],
-      default: ROLES.PARENT,
-    },
+    // role: {
+    //   type: String,
+    //   enum: [ROLES.TEACHER, ROLES.PARENT],
+    //   default: ROLES.PARENT,
+    // },
   },
   { timestamps: true, versionKey: false },
 );

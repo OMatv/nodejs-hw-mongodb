@@ -1,9 +1,18 @@
+/* eslint-disable no-unused-vars */
+export default function errorHandler (err, req, res, _next) {
 
-export default function errorHandler  (error, req, res) {
-  const {status = 500, message} = error;
-  res.status(status).json({
-      message,
+  if (err.status && err.expose) {
+    res.status(err.status).json({
+      status: err.status,
+      message: err.message || 'Error',
+      data: err,
+    });
+    return;
+  }
+
+  res.status(500).json({
+    status: 500,
+    message: 'Something went wrong',
+    data: err.message,
   });
 };
-
-
