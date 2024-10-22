@@ -4,7 +4,7 @@ import{phoneNumberRegexp, emailRegexp} from '../constants/contacts.js';
 
 export const createContactchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
-  phoneNumber: Joi.number().pattern(phoneNumberRegexp).required(),
+  phoneNumber: Joi.string().pattern(phoneNumberRegexp).required(),
   email: Joi.string().pattern(emailRegexp).optional(),
   isFavourite: Joi.boolean().optional(),
   contactType: Joi.string()
