@@ -28,10 +28,11 @@ const userSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-        updateAt: {
+    updateAt: {
           type: Date,
           default: Date.now,
                 },
+    photo:{ type: String, default: null },
     // role: {
     //   type: String,
     //   enum: [ROLES.TEACHER, ROLES.PARENT],

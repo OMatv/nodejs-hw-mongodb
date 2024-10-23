@@ -1,9 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { handleSaveError, setUpdateOptions } from './hooks.js';
 
-
-
-
 const contactSchema = new Schema(
   {
     name: {
@@ -33,8 +30,8 @@ const contactSchema = new Schema(
       ref: 'users',
       required: true,
     },
-    
-    photo: { type: String },
+
+    photo: { type: String},
   },
   {
     timestamps: true,
@@ -57,6 +54,7 @@ export const sortFields = [
   'contactType',
   'createdAt',
   'updatedAt',
+  'photo',
 ];
 
 export default ContactsCollection;

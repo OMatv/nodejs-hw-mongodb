@@ -5,6 +5,7 @@ import { requestResetToken } from '../services/auth.js';
 
 import { resetPassword } from '../services/auth.js';
 
+import { serializeUser } from '../utils/serializeUser.js';
 
 const setupSession = (res, session) => {
   console.log('session.refreshTokenValidUntil:', session.refreshTokenValidUntil);
@@ -57,12 +58,12 @@ export const refreshController = async (req, res) => {
 
 
 export const registerController = async (req, res) => {
-  const newUser = await authServices.register(req.body);
+  const user = await authServices.register(req.body);
 
   res.status(201).json({
     status: 201,
     message: 'Successfully registered a user',
-    data: newUser,
+    data: serializeUser(user),
   });
 };
 

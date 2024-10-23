@@ -4,7 +4,7 @@ import * as contactControllers from '../controllers/contacts.js';
 
 import {authenticate} from '../middlewares/authenticate.js';
 
-import isValidId from '../middlewares/isValidId.js';
+import {isValidId} from '../middlewares/isValidId.js';
 
 import ctrlWrapper from '../utils/ctrlWrapper.js';
 import validateBody from '../middlewares/validateBody.js';
@@ -22,6 +22,8 @@ import { upload } from "../middlewares/multer.js";
 
 const contactsRouter = Router();
 
+
+contactsRouter.use('/contactId', isValidId('contactId'));
 contactsRouter.use(authenticate);
 
 contactsRouter.get(
@@ -34,33 +36,6 @@ contactsRouter.get(
   isValidId,
   ctrlWrapper(contactControllers.getContactByIdController),
 );
-
-contactsRouter.post(
-  '/', //checkRoles(ROLES.TEACHER),
-  validateBody(createContactchema),
-  ctrlWrapper(contactControllers.createContactController),
-);
-
-contactsRouter.put(
-  '/:contactId', //checkRoles(ROLES.TEACHER),
-  isValidId,
-  validateBody(createContactchema),
-  ctrlWrapper(contactControllers.upsertContactController),
-);
-
-contactsRouter.patch(
-  '/:contactId', //checkRoles(ROLES.TEACHER, ROLES.PARENT),
-  isValidId,
-  validateBody(updateContactSchema),
-  ctrlWrapper(contactControllers.patchContactController),
-);
-
-contactsRouter.delete(
-  '/:contactId', //checkRoles(ROLES.TEACHER),
-  isValidId,
-  ctrlWrapper(contactControllers.deleteContactController),
-);
-
 
 contactsRouter.post(
   '/',
@@ -88,4 +63,13 @@ contactsRouter.patch(
   validateBody(updateContactSchema),
   ctrlWrapper(contactControllers.patchContactController),
 );
+
+contactsRouter.delete(
+  '/:contactId', //checkRoles(ROLES.TEACHER),
+  isValidId,
+  ctrlWrapper(contactControllers.deleteContactController),
+);
+
+
+
 export default contactsRouter;

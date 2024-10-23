@@ -86,7 +86,7 @@ export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const photo = req.file;
 
-  let photoUrl;
+   let photoUrl;
 
   if (photo) {
     if (env('ENABLE_CLOUDINARY') === 'true') {

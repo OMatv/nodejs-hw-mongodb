@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import cookieParser from 'cookie-parser';
 
+
 import { env} from './utils/env.js';
 
 import notFoundHandler from './middlewares/notFoundHandler.js';
@@ -21,13 +22,14 @@ import morgan from 'morgan';
 import { UPLOAD_DIR } from './constants/index.js';
 
 
-
 export default function startServer() {
   const app = express();
 
   app.use(logger);
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({
+    type: ['application/json', 'application/vnd.api+json'],
+  }));
 
   app.use(cookieParser());
   app.use(morgan('dev'));
@@ -49,6 +51,7 @@ export default function startServer() {
   app.use(errorHandler);
 
   app.use('/uploads', express.static(UPLOAD_DIR));
+
 
 
   const port = Number(env('PORT', '3000'));
