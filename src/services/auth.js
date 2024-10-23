@@ -14,7 +14,7 @@ import {
 
 import jwt from 'jsonwebtoken';
 import { SMTP } from '../constants/index.js';
-import  TEMPLATES_DIR from '../constants/index.js';
+import  {TEMPLATES_DIR} from '../constants/index.js';
 import { env } from '../utils/env.js';
 import { sendEmail } from '../utils/sendMail.js';
 
