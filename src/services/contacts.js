@@ -1,10 +1,8 @@
 import ContactsCollection from '../db/models/contact.js';
-
 import { SORT_ORDER } from '../constants/index.js';
 import calculatePaginationData from '../utils/calculatePaginationData.js';
-// import {saveImage} from '../utils/saveImage.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
 
-import {  saveFileToUploadDir} from '../utils/saveFileToUploadDir.js';
 export const getAllContacts = async ({
   page = 1,
   perPage = 10,
@@ -15,39 +13,29 @@ export const getAllContacts = async ({
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactsCollection.find({userId: filter.userId});
-  if (filter.name) {
-    contactsQuery.where('name').equals(filter.name);
-    }
-  if (filter.email) {
-    contactsQuery.where('email').equals(filter.email);
+  // Початковий запит з фільтром по userId
+  const contactsQuery = ContactsCollection.find({ userId: filter.userId });
+
+  // Фільтрація за іншими полями, якщо вони присутні
+  if (filter.name) contactsQuery.where('name').equals(filter.name);
+  if (filter.email) contactsQuery.where('email').equals(filter.email);
+  if (filter.phoneNumber) contactsQuery.where('phoneNumber').equals(filter.phoneNumber);
+
+  // Фільтрація за типом контакту (home, work, personal)
+  if (filter.contactsType) contactsQuery.where('contactsType').equals(filter.contactsType);
+
+  // Фільтрація за статусом "вибране"
+  if (typeof filter.isFavourite === 'boolean') {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
-  if (filter.phoneNumber) {
-    contactsQuery.where('phoneNumber').equals(filter.phoneNumber);
-     }
-     if (filter.home) {
-      contactsQuery.where('contactsType').equals(filter.home);
-     }
-         if (filter.work) {
-      contactsQuery.where('contactsType').equals(filter.work);
-     }
-     if (filter.personal) {
-      contactsQuery.where('contactsType').equals(filter.personal);
-     }
-     if (filter.isFavourite) {
-      contactsQuery.where('isFavourite').equals(filter.isFavourite);
-     }
-    //  if (filter.urerId) {
-    //   contactsQuery.where('userId').equals(filter.userId);
-    //  }
 
+  // Отримання кількості контактів та списку контактів
+  const [contactsCount, contacts] = await Promise.all([
+    contactsQuery.clone().countDocuments(),
+    contactsQuery.skip(skip).limit(limit).sort({ [sortBy]: sortOrder }).exec(),
+  ]);
 
-    const [contactsCount, contacts ] = await Promise.all([
-      ContactsCollection.find({userId: filter.userId}).merge(contactsQuery).countDocuments(),
-      contactsQuery.skip(skip).limit(limit).sort({ [sortBy]: sortOrder })
-      .exec(),
-    ])
-
+  // Розрахунок даних для пагінації
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {
@@ -55,36 +43,30 @@ export const getAllContacts = async ({
     ...paginationData,
   };
 };
-export const getContactById = async (filter) => {
-  return ContactsCollection.findById(filter);
+
+export const getContactById = async (id) => {
+  return ContactsCollection.findById(id);
 };
 
 export const createContact = async (payload) => {
   return ContactsCollection.create(payload);
 };
 
-export const updateContact = async (filter, data, { file, ...payload }, options = {}) => {
+export const updateContact = async (filter, { file, ...payload }, options = {}) => {
   let photoUrl;
   if (file) {
-    // photoUrl = await saveImage(file);
+    // Збереження файлу та отримання URL
     photoUrl = await saveFileToUploadDir(file);
+    payload.photoUrl = photoUrl;
   }
-  const rawResult = await ContactsCollection.findOneAndUpdate(
+
+  const updatedContact = await ContactsCollection.findOneAndUpdate(
     filter,
-    data,
-    {...payload, photoUrl},
-    {
-      includeResultMetadata: true,
-        ...options,
-    },
+    { $set: payload },
+    { new: true, upsert: false, ...options }
   );
 
-  if (!rawResult || !rawResult.value) return null;
-
-  return {
-    data: rawResult.value,
-    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
-  };
+  return updatedContact;
 };
 
 export const deleteContact = async (filter) => {

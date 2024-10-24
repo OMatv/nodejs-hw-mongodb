@@ -1,12 +1,7 @@
 import { model, Schema } from 'mongoose';
-
-// import { ROLES } from '../../constants/index.js';
-
 import { emailRegexp } from '../../constants/users.js';
-
 import { handleSaveError, setUpdateOptions } from './hooks.js';
 
-//register of users
 const userSchema = new Schema(
   {
     name: {
@@ -18,21 +13,17 @@ const userSchema = new Schema(
       unique: true,
       match: emailRegexp,
       required: true,
+      trim: true, // Додано для видалення пробілів
     },
     password: {
       type: String,
       required: true,
+      minlength: 6, // Додано мінімальну довжину пароля
     },
-
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    photo: {
+      type: String,
+      default: null
     },
-    updateAt: {
-          type: Date,
-          default: Date.now,
-                },
-    photo:{ type: String, default: null },
     // role: {
     //   type: String,
     //   enum: [ROLES.TEACHER, ROLES.PARENT],
@@ -43,9 +34,7 @@ const userSchema = new Schema(
 );
 
 userSchema.post('save', handleSaveError);
-
 userSchema.pre('findOneAndUpdate', setUpdateOptions);
-
 userSchema.post('findOneAndUpdate', handleSaveError);
 
 const UsersCollection = model('users', userSchema);

@@ -3,7 +3,7 @@ import Joi from 'joi';
 import {phoneNumberRegexp, emailRegexp} from '../constants/contacts.js';
 
 
-export const createContactchema = Joi.object({
+export const createContactSchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
   phoneNumber: Joi.string().pattern(phoneNumberRegexp).required(),
   email: Joi.string().email(emailRegexp).optional(),
@@ -12,6 +12,8 @@ export const createContactchema = Joi.object({
     .valid('work', 'home', 'personal')
     .default('personal')
     .optional(),
+    photo: Joi.string().optional(),
+
    });
 
 export const updateContactSchema = Joi.object({
@@ -20,4 +22,6 @@ export const updateContactSchema = Joi.object({
   email: Joi.string().email().optional(),
   isFavourite: Joi.boolean().optional(),
   contactType: Joi.string().valid('work', 'home', 'personal').optional(),
+  photo: Joi.string().optional(),
+
 });

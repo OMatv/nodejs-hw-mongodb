@@ -1,7 +1,5 @@
 import { Schema, model } from 'mongoose';
-
 import { handleSaveError, setUpdateOptions } from './hooks.js';
-
 
 const sessionsSchema = new Schema(
   {
@@ -12,11 +10,23 @@ const sessionsSchema = new Schema(
     },
     accessToken: {
       type: String,
-      required: true,
+      required: [true, 'Access token is required'],
+      validate: {
+        validator: function (v) {
+          return v && v.length > 0; // Додано перевірку на ненульове значення
+        },
+        message: 'Access token cannot be empty',
+      },
     },
     refreshToken: {
       type: String,
-      required: true,
+      required: [true, 'Refresh token is required'],
+      validate: {
+        validator: function (v) {
+          return v && v.length > 0; // Додано перевірку на ненульове значення
+        },
+        message: 'Refresh token cannot be empty',
+      },
     },
     accessTokenValidUntil: {
       type: Date,
@@ -31,10 +41,11 @@ const sessionsSchema = new Schema(
 );
 
 sessionsSchema.post('save', handleSaveError);
-
 sessionsSchema.pre('findOneAndUpdate', setUpdateOptions);
-
 sessionsSchema.post('findOneAndUpdate', handleSaveError);
+
+// Додайте індекс на userId для підвищення продуктивності запитів
+sessionsSchema.index({ userId: 1 });
 
 const SessionsCollection = model('sessions', sessionsSchema);
 
