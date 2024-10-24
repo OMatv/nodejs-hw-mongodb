@@ -141,13 +141,14 @@ export const requestResetToken = async (email) => {
     },
     env('JWT_SECRET'),
     {
-      expiresIn: '15m',
+      expiresIn: '5m',
     },
   );
 
-  const resetPasswordTemplatePath = path.join(
+
+    const resetPasswordTemplatePath = path.join(
     TEMPLATES_DIR,
-    'reset-password-email.html',
+    'reset-password.html',
   );
 
   const templateSource = (

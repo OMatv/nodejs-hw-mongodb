@@ -1,9 +1,7 @@
 
 import * as authServices from '../services/auth.js';
 
-import { requestResetToken } from '../services/auth.js';
-
-import { resetPassword } from '../services/auth.js';
+// import { requestResetToken, resetPassword} from '../services/auth.js';
 
 import { serializeUser } from '../utils/serializeUser.js';
 
@@ -98,7 +96,7 @@ export const logoutController = async (req, res) => {
 
 
 export const requestResetEmailController = async (req, res) => {
-  await requestResetToken(req.body.email);
+  await authServices.requestResetToken(req.body.email);
   res.json({
     message: 'Reset password email was successfully sent!',
     status: 200,
@@ -107,7 +105,7 @@ export const requestResetEmailController = async (req, res) => {
 };
 
 export const resetPasswordController = async (req, res) => {
-  await resetPassword(req.body);
+  await authServices.resetPassword(req.body);
   res.json({
     message: 'Password was successfully reset!',
     status: 200,

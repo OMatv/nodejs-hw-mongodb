@@ -82,51 +82,46 @@ export const upsertContactController = async (req, res) => {
   });
 };
 
+
 export const patchContactController = async (req, res, next) => {
-  const { contactId } = req.params;
-  const photo = req.file;
+  try {
+    const { contactId } = req.params;
+    const photo = req.file;
 
-   let photoUrl;
-
-  if (photo) {
-    if (env('ENABLE_CLOUDINARY') === 'true') {
-      photoUrl = await saveFileToCloudinary(photo);
-    } else {
-      photoUrl = await saveFileToUploadDir(photo);
+    // Перевіряємо, чи передано файл
+    let photoUrl = null;
+    if (photo) {
+      // Залежно від значення змінної ENABLE_CLOUDINARY зберігаємо файл
+      if (env.ENABLE_CLOUDINARY === 'true') {
+        photoUrl = await saveFileToCloudinary(photo);
+      } else {
+        photoUrl = await saveFileToUploadDir(photo);
+      }
     }
+
+    // Оновлюємо контакт
+    const result = await contactsServices.updateContact(contactId, {
+      ...req.body,
+      photo: photoUrl, // Додаємо URL фото до об'єкта
+    });
+
+    // Якщо контакт не знайдено, повертаємо помилку
+    if (!result) {
+      return next(createHttpError(404, `Contact not found`));
+    }
+
+    // Повертаємо успішну відповідь
+    res.json({
+      status: 200,
+      message: `Successfully patched a contact!`,
+      data: result,
+    });
+  } catch (error) {
+    // Обробка помилок
+    next(error);
   }
-
-  const result = await contactsServices.updateContact(contactId, {
-    ...req.body,
-    photo: photoUrl,
-  });
-
-
-
-  if (!result) {
-    next(createHttpError(404, ~`Contact  not found`));
-    return;
-  }
-
-
-  res.json({
-    status: 200,
-    message: `Successfully patched a contact!`,
-    data: result.data,
-  });
 };
-  /* в photo лежить обʼєкт файлу
-		{
-		  fieldname: 'photo',
-		  originalname: 'download.jpeg',
-		  encoding: '7bit',
-		  mimetype: 'image/jpeg',
-		  destination: '/Users/borysmeshkov/Projects/goit-study/students-app/temp',
-		  filename: '1710709919677_download.jpeg',
-		  path: '/Users/borysmeshkov/Projects/goit-study/students-app/temp/1710709919677_download.jpeg',
-		  size: 7
-	  }
-	*/
+
 
 export const deleteContactController = async (req, res) => {
   const { id } = req.params;

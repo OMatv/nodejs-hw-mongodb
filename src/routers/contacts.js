@@ -40,17 +40,14 @@ contactsRouter.get(
 contactsRouter.post(
   '/',
   //checkRoles(ROLES.TEACHER),
-  isValidId,
-  upload.single('photo'), // додаємо цю middleware
+  isValidId, upload.single('photo'), // додаємо цю middleware
   validateBody(createContactchema),
   ctrlWrapper(contactControllers.createContactController),
 );
-
 contactsRouter.put(
   '/:contactId',
   //checkRoles(ROLES.TEACHER),
-  isValidId,
-  upload.single('photo'), // додаємо цю middleware
+  isValidId, upload.single('photo'),
   validateBody(createContactchema),
   ctrlWrapper(contactControllers.upsertContactController),
 );
@@ -58,8 +55,7 @@ contactsRouter.put(
 contactsRouter.patch(
   '/:contactId',
   //checkRoles(ROLES.TEACHER, ROLES.PARENT),
-  isValidId,
-  upload.single('photo'), // додаємо цю middleware
+  isValidId, upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(contactControllers.patchContactController),
 );
