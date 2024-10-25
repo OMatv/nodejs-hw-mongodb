@@ -1,19 +1,16 @@
-
-
 // Функція для перевірки і валідації рядка
 const parseString = (value) => {
-  if (typeof value !== "string" || value.trim() === "") return;
+  if (typeof value !== "string" || value.trim() === "") return undefined; // Явне повернення undefined
   return value.trim();
 };
 
 // Функція для перевірки і валідації телефонного номера
 const parseNumber = (number) => {
-  const isString = typeof number === 'string';
-  if (!isString) return;
+  if (typeof number !== 'string') return undefined;
 
-  const parsedNumber = parseInt(number, 10); // Додали підставу 10
+  const parsedNumber = parseInt(number, 10);
   if (Number.isNaN(parsedNumber)) {
-    return;
+    return undefined;
   }
 
   return parsedNumber;
@@ -21,22 +18,24 @@ const parseNumber = (number) => {
 
 // Функція для перевірки і валідації типу контакту
 const parseContactType = (value) => {
-  if (typeof value !== 'string') return; // Змінено на '!=='
+  if (typeof value !== 'string') return undefined; // Перевірка типу
   const contactTypes = ['work', 'home', 'personal'];
-  if (!contactTypes.includes(value)) return; // Прибираємо зайву крапку з коми
-  return value; // Повертаємо value
+  if (!contactTypes.includes(value)) return undefined;
+  return value;
 };
 
 // Головна функція для парсингу параметрів запиту
-export default function parseContactFilterParams({ query = {} }) { // Додаємо значення за замовчуванням
+export default function parseContactFilterParams({ query = {} }) {
   const { name, email, phoneNumber, contactType, isFavourite } = query;
 
+  // Парсимо та конвертуємо параметри
   const parsedName = parseString(name);
   const parsedPhoneNumber = parseNumber(phoneNumber);
   const parsedEmail = parseString(email);
   const parsedContactType = parseContactType(contactType);
-  const parsedIsFavourite = isFavourite === 'true' ? true : isFavourite === 'false' ? false : undefined; // Додали значення за замовчуванням
+  const parsedIsFavourite = isFavourite === 'true' ? true : isFavourite === 'false' ? false : undefined;
 
+  // Повертаємо об'єкт з відфільтрованими параметрами
   return {
     name: parsedName,
     phoneNumber: parsedPhoneNumber,

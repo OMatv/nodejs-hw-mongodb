@@ -11,22 +11,11 @@ const sessionsSchema = new Schema(
     accessToken: {
       type: String,
       required: [true, 'Access token is required'],
-      validate: {
-        validator: function (v) {
-          return v && v.length > 0; // Додано перевірку на ненульове значення
         },
-        message: 'Access token cannot be empty',
-      },
-    },
     refreshToken: {
       type: String,
       required: [true, 'Refresh token is required'],
-      validate: {
-        validator: function (v) {
-          return v && v.length > 0; // Додано перевірку на ненульове значення
-        },
-        message: 'Refresh token cannot be empty',
-      },
+
     },
     accessTokenValidUntil: {
       type: Date,

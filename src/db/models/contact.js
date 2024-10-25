@@ -9,7 +9,7 @@ const contactSchema = new Schema(
       trim: true,
     },
     phoneNumber: {
-      type: String, // Змінив на String, якщо ви очікуєте форматовані номери
+      type: String,
       required: [true, 'Phone number is required'],
     },
     email: {

@@ -13,12 +13,12 @@ const userSchema = new Schema(
       unique: true,
       match: emailRegexp,
       required: true,
-      trim: true, // Додано для видалення пробілів
+      trim: true,
     },
     password: {
       type: String,
       required: true,
-      minlength: 6, // Додано мінімальну довжину пароля
+      minlength: 6, 
     },
     photo: {
       type: String,
