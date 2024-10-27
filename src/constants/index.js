@@ -6,7 +6,6 @@ ASC:"asc",
 DESC: "desc",
 }
 
-
 export const SMTP
  = {
   SMTP_HOST: 'SMTP_HOST',
