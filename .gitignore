@@ -2,7 +2,6 @@
 
 .env
 
-google-oauth.json
 
 .vscode
 .DS_Store
