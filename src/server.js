@@ -11,7 +11,7 @@ import routers from './routers/index.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandler.js';
 import { UPLOAD_DIR } from './constants/index.js';
-// import { swaggerDocs } from './middlewares/swaggerDocs.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 
 const PORT = Number(env('PORT', '3000'));
@@ -42,7 +42,7 @@ export const startServer = () => {
     });
   });
   app.use('/uploads', express.static(UPLOAD_DIR));
-  // app.use('/api-docs', swaggerDocs());
+  app.use('/api-docs', swaggerDocs());
   app.use(routers);
   app.use('*', notFoundHandler);
   app.use(errorHandlerMiddleware);
