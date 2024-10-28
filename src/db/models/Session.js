@@ -10,13 +10,12 @@ const sessionsSchema = new Schema(
     },
     accessToken: {
       type: String,
-      required: [true, 'Access token is required'],
+      required: true,
         },
     refreshToken: {
       type: String,
-      required: [true, 'Refresh token is required'],
-
-    },
+      required: true,
+          },
     accessTokenValidUntil: {
       type: Date,
       required: true,

@@ -1,5 +1,3 @@
-
-
 import { SORT_ORDER } from '../constants/index.js';
 
 const parseSortOrder = (sortOrder) => {
@@ -9,7 +7,7 @@ const parseSortOrder = (sortOrder) => {
 };
 
 const parseSortBy = (sortBy) => {
-  const keysOfContact = ['_id', 'name',"phoneNumber"];
+  const keysOfContact = ['name'];
 
   if (keysOfContact.includes(sortBy)) {
     return sortBy;
@@ -18,7 +16,7 @@ const parseSortBy = (sortBy) => {
   return '_id';
 };
 
-export default function parseSortParams(query) {
+export const parseSortParams = (query) => {
   const { sortOrder, sortBy } = query;
 
   const parsedSortOrder = parseSortOrder(sortOrder);
@@ -28,4 +26,4 @@ export default function parseSortParams(query) {
     sortOrder: parsedSortOrder,
     sortBy: parsedSortBy,
   };
-}
+};

@@ -18,7 +18,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6, 
+      minlength: 6,
     },
     photo: {
       type: String,
@@ -40,3 +40,4 @@ userSchema.post('findOneAndUpdate', handleSaveError);
 const UsersCollection = model('users', userSchema);
 
 export default UsersCollection;
+

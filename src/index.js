@@ -1,5 +1,4 @@
-import startServer from './server.js';
-import 'dotenv/config';
+import {startServer} from './server.js';
 
 import { initMongoConnection } from './db/initMongoConnection.js';
 console.log(process.env.MONGODB_USER);

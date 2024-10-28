@@ -1,136 +1,135 @@
+/* eslint-disable no-unused-vars */
 import createHttpError from 'http-errors';
-
-import * as contactsServices from '../services/contacts.js';
-
-import parsePaginationParams from '../utils/parsePaginationParams.js';
-import parseSortParams from '../utils/parseSortParams.js';
-import parseContactFilterParams from '../utils/filters/parseContactFilterParams.js';
-
-import { sortFields } from '../db/models/contact.js';
-
-
-import {  saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
-
-import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import {
+  addContact,
+  deleteContact,
+  getAllContacts,
+  getContactById,
+  updateContact,
+} from '../services/contacts.js';
+import  parsePaginationParams  from '../utils/parsePaginationParams.js';
+import  {parseSortParams}  from '../utils/parseSortParams.js';
+import  parseContactFilterParams  from '../utils/filters/parseContactFilterParams.js';
 import { env } from '../utils/env.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
 
 export const getAllContactsController = async (req, res) => {
-  const { perPage, page } = parsePaginationParams(req.query);
-  const { sortBy, sortOrder } = parseSortParams({ ...req.query, sortFields });
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortOrder, sortBy } = parseSortParams(req.query);
+
   const filter = parseContactFilterParams(req.query);
 
-  const { _id: userId } = req.user;
-
-  const data = await contactsServices.getAllContacts({
-    perPage,
+  const contacts = await getAllContacts({
     page,
-    sortBy,
+    perPage,
     sortOrder,
-    filter: { ...filter, userId },
+    sortBy,
+    filter,
+    userId: req.user._id.toString(),
   });
 
-  res.json({
+  res.status(200).json({
     status: 200,
-    message: 'Contacts successfully found',
-    data,
+    message: 'Successfully found contacts!',
+    data: contacts,
   });
 };
+export const getContactByIdController = async (req, res, next) => {
+  const { contactId } = req.params;
 
+  const contact = await getContactById(contactId);
 
-export const getContactByIdController = async (req, res) => {
-  const { id } = req.params;
-  const { _id: userId } = req.user;
-  const data = await contactsServices.getContactById({ _id: id, userId });
-
-  if (!data) {
-    throw createHttpError(404, `Contact with id=${id} not found`);
+  if (contact.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You do not have access rights to this contact',
+    });
+    return;
+  }
+  if (!contact) {
+    res.status(404).json({
+      message: 'Contact not found',
+    });
+    return;
   }
 
-  res.json({
+  // Відповідь, якщо контакт знайдено
+  res.status(200).json({
     status: 200,
-    message: `Contact with ${id} successfully found`,
-    data,
+    message: `Contact with ID: ${contactId} found`,
+    data: contact,
   });
 };
+export const addContactController = async (req, res, next) => {
+  const reqData = { ...req.body, userId: req.user._id };
+  const photo = req.file;
+  let photoUrl;
 
-export const addContactController = async (req, res) => {
-  const { _id: userId } = req.user;
-  const data = await contactsServices.addContact({ ...req.body, userId });
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
+  const contact = await addContact({ ...reqData, photo: photoUrl });
   res.status(201).json({
     status: 201,
-    message: 'Contact add successfully',
-    data,
+    message: 'Successfully created a contact!',
+    data: contact,
   });
 };
-
-export const upsertContactController = async (req, res) => {
-  const { id } = req.params;
-  const { _id: userId } = req.user;
-  const { isNew, data } = await contactsServices.updateContact(
-    { _id: id, userId },
-    req.body,
-    { upsert: true },
-  );
-
-  const status = isNew ? 201 : 200;
-
-  res.status(status).json({
-    status,
-    message: 'Contact upsert successfully',
-    data,
-  });
-};
-
-
 export const patchContactController = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const photo = req.file;
+  const { contactId } = req.params;
+  // console.log(req.params);
+  const { body } = req;
+  const contactCheck = await getContactById(contactId);
 
-    // Перевіряємо, чи передано файл
-    let photoUrl = null;
-    if (photo) {
-      // Залежно від значення змінної ENABLE_CLOUDINARY зберігаємо файл
-      if (env.ENABLE_CLOUDINARY === 'true') {
-        photoUrl = await saveFileToCloudinary(photo);
-      } else {
-        photoUrl = await saveFileToUploadDir(photo);
-      }
-    }
-
-    // Оновлюємо контакт
-    const result = await contactsServices.updateContact(contactId, {
-      ...req.body,
-      photo: photoUrl, // Додаємо URL фото до об'єкта
+  if (contactCheck.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You do not have access rights to this contact',
     });
-
-    // Якщо контакт не знайдено, повертаємо помилку
-    if (!result) {
-      return next(createHttpError(404, `Contact not found`));
-    }
-
-    // Повертаємо успішну відповідь
-    res.json({
-      status: 200,
-      message: `Successfully patched a contact!`,
-      data: result,
-    });
-  } catch (error) {
-    // Обробка помилок
-    next(error);
+    return;
   }
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+  const { contact } = await updateContact(contactId, {
+    ...body,
+    photo: photoUrl,
+  });
+  console.log(contact);
+
+  res.send({
+    status: 200,
+    message: 'Successfully patched a contact!',
+    data: contact,
+  });
 };
-
-
 export const deleteContactController = async (req, res) => {
-  const { id } = req.params;
-  const { _id: userId } = req.user;
-  const data = await contactsServices.deleteContact({ _id: id, userId });
+  const { contactId } = req.params;
+  const contactCheck = await getContactById(contactId);
 
-  if (!data) {
-    throw createHttpError(404, `Contact with id=${id} not found`);
+  if (contactCheck.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You do not have access rights to this contact',
+    });
+    return;
   }
-
+  const contact = await deleteContact(contactId);
+  if (!contact) {
+    throw createHttpError(404, 'Contact not found');
+  }
   res.status(204).send();
 };

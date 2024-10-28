@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
-export default function errorHandler (err, req, res, _next) {
 
-  if (err.status && err.expose) {
-    res.status(err.status).json({
+import { isHttpError } from 'http-errors';
+export const errorHandlerMiddleware = (err, req, res, next) => {
+  if (isHttpError(err)) {
+    return res.status(err.status).json({
       status: err.status,
-      message: err.message || 'Error',
-      data: err,
+      error: err,
     });
-    return;
   }
 
   res.status(500).json({

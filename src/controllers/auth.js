@@ -1,126 +1,125 @@
-import * as authServices from '../services/auth.js';
-import { serializeUser } from '../utils/serializeUser.js';
+import { ONE_DAY } from '../constants/index.js';
+import {
+  loginUser,
+  logoutUser,
+  refreshUsersSession,
+  registerUser,
+  requestResetToken,
+  resetPassword,
+} from '../services/auth.js';
+import { responseAuth } from '../services/responseAuth.js';
 
-const setupSession = (res, session) => {
-  console.log('session.refreshTokenValidUntil:', session.refreshTokenValidUntil);
 
-  let expires;
-  if (typeof session.refreshTokenValidUntil === 'number') {
-    expires = new Date(Date.now() + session.refreshTokenValidUntil);
-  } else if (session.refreshTokenValidUntil instanceof Date) {
-    expires = session.refreshTokenValidUntil;
-  } else {
-    throw new Error('Invalid type for refreshTokenValidUntil');
-  }
-
-  console.log('Calculated expiration date:', expires);
-
-  if (isNaN(expires.getTime())) {
-    throw new Error('Invalid expiration date');
-  }
-
+export const registerUserController = async (req, res) => {
+  const user = await registerUser(req.body);
+  const responseData = responseAuth(user);
+  res.status(201).json({
+    status: 201,
+    message: 'Successfully registered user',
+    data: responseData,
+  });
+};
+export const loginUserController = async (req, res) => {
+  const session = await loginUser(req.body);
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
-    expires,
+    sameSite: 'None',
+    secure: true,
+    expires: new Date(Date.now() + ONE_DAY),
   });
-
-  res.cookie('sessionId', session._id.toString(), {
+  res.cookie('sessionId', session._id, {
     httpOnly: true,
-    expires,
+    sameSite: 'None',
+    secure: true,
+    expires: new Date(Date.now() + ONE_DAY),
+  });
+
+  res.json({
+    status: 200,
+    message: 'Successfully logged in an user!',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};
+export const logoutUserController = async (req, res) => {
+  if (req.cookies.sessionId) {
+    await logoutUser(req.cookies.sessionId);
+  }
+
+  res.clearCookie('sessionId');
+  res.clearCookie('refreshToken');
+
+  res.status(204).send();
+};
+const setupSession = (res, session) => {
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true,
+    expires: new Date(Date.now() + ONE_DAY),
+  });
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true,
+    expires: new Date(Date.now() + ONE_DAY),
   });
 };
 
-export const refreshController = async (req, res, next) => {
-  try {
-    const session = await authServices.refreshSession({
-      sessionId: req.cookies.sessionId,
-      refreshToken: req.cookies.refreshToken,
-    });
+export const refreshUserSessionController = async (req, res) => {
+  const session = await refreshUsersSession({
+    sessionId: req.cookies.sessionId,
+    refreshToken: req.cookies.refreshToken,
+  });
 
-    setupSession(res, session);
+  setupSession(res, session);
 
-    res.json({
-      status: 200,
-      message: 'Successfully refreshed a session',
-      data: {
-        accessToken: session.accessToken,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+  res.json({
+    status: 200,
+    message: 'Successfully refreshed a session!',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
 };
 
-export const registerController = async (req, res, next) => {
-  try {
-    const user = await authServices.register(req.body);
+export const requestResetTokenController = async (req, res) => {
+  await requestResetToken(req.body.email);
 
-    res.status(201).json({
-      status: 201,
-      message: 'Successfully registered a user',
-      data: serializeUser(user),
-    });
-  } catch (error) {
-    next(error);
-  }
+  res.json({
+    message: 'Reset password email was successfully sent!',
+    status: 200,
+    data: {},
+  });
+};
+export const resetPasswordController = async (req, res) => {
+  await resetPassword(req.body);
+  res.status(200).json({
+    message: 'Password was successfully reset!',
+    status: 200,
+    data: {},
+  });
 };
 
-export const loginController = async (req, res, next) => {
-  try {
-    console.log('Login attempt:', req.body);
-    const session = await authServices.login(req.body);
+//   const url = generateAuthUrl();
+//   res.json({
+//     status: 200,
+//     message: 'Successfully get Google OAuth url!',
+//     data: {
+//       url,
+//     },
+//   });
+// };
+// export const loginWithGoogleController = async (req, res) => {
+//   const session = await loginOrSignupWithGoogle(req.body.code);
+//   setupSession(res, session);
 
-    setupSession(res, session);
-
-    res.json({
-      status: 200,
-      message: 'Successfully logged in an user!',
-      data: {
-        accessToken: session.accessToken,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const logoutController = async (req, res, next) => {
-  try {
-    if (req.cookies.sessionId) {
-      await authServices.logout(req.cookies.sessionId);
-    }
-
-    res.clearCookie('sessionId');
-    res.clearCookie('refreshToken');
-
-    res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const requestResetEmailController = async (req, res, next) => {
-  try {
-    await authServices.requestResetToken(req.body.email);
-    res.json({
-      message: 'Reset password email was successfully sent!',
-      status: 200,
-      data: {},
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const resetPasswordController = async (req, res, next) => {
-  try {
-    await authServices.resetPassword(req.body);
-    res.json({
-      message: 'Password was successfully reset!',
-      status: 200,
-      data: {},
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//   res.json({
+//     status: 200,
+//     message: 'Successfully logged in via Google OAuth!',
+//     data: {
+//       accessToken: session.accessToken,
+//     },
+//   });
+// };
