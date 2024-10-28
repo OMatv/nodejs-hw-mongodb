@@ -24,11 +24,6 @@ const userSchema = new Schema(
       type: String,
       default: null
     },
-    // role: {
-    //   type: String,
-    //   enum: [ROLES.TEACHER, ROLES.PARENT],
-    //   default: ROLES.PARENT,
-    // },
   },
   { timestamps: true, versionKey: false },
 );
