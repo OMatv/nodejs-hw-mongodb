@@ -32,7 +32,7 @@ userSchema.post('save', handleSaveError);
 userSchema.pre('findOneAndUpdate', setUpdateOptions);
 userSchema.post('findOneAndUpdate', handleSaveError);
 
-const UsersCollection = model('user', userSchema);
+const UsersCollection = model('users', userSchema);
 
 export default UsersCollection;
 
